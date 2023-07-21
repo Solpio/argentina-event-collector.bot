@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { EventDto } from 'src/event/dto/event.dto';
 
 @Injectable()
@@ -11,11 +11,21 @@ export class EventService {
     const createEvent = new this.eventModel(createDto);
     return createEvent.save();
   }
-  async findById(id: number) {
-    return this.eventModel.findOne({ id });
+  async findById(id: string) {
+    const obj = new Types.ObjectId(id);
+    return this.eventModel.findOne({ _id: obj });
   }
 
   async findAllId(id: number) {
     return this.eventModel.find({ id });
+  }
+
+  async findAndDelete(id: string) {
+    const obj = new Types.ObjectId(id);
+    return this.eventModel.findOneAndDelete({ _id: obj });
+  }
+
+  async deleteEvent(id: string) {
+    return this.findAndDelete(id);
   }
 }
