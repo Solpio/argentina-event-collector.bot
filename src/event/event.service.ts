@@ -11,4 +11,11 @@ export class EventService {
     const createEvent = new this.eventModel(createDto);
     return createEvent.save();
   }
+  async findById(id: number) {
+    return this.eventModel.findOne({ id });
+  }
+
+  async findAllId(id: number) {
+    return this.eventModel.find({ id });
+  }
 }

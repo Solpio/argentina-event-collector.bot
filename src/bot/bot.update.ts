@@ -19,7 +19,12 @@ export class BotUpdate {
   ) {
     await ctx.reply('Привет, можешь выбрать интересующую тебя функцию', {
       reply_markup: {
-        keyboard: [[{ text: 'Оставить заявку на мероприятие' }]],
+        keyboard: [
+          [
+            { text: 'Оставить заявку на мероприятие' },
+            { text: 'Мои мероприятия' },
+          ],
+        ],
       },
     });
   }
@@ -33,6 +38,16 @@ export class BotUpdate {
   ) {
     if (msg === 'Оставить заявку на мероприятие') {
       ctx.scene.enter('createEvent');
+    }
+    if (msg === 'Мои мероприятия') {
+      const events = await this.eventService.findAllId(from.id);
+      if (events.length) {
+        events.forEach((event) => {
+          ctx.reply(event['title']);
+        });
+      } else {
+        ctx.reply('Никаких мероприятий не запланировано');
+      }
     }
   }
 }
