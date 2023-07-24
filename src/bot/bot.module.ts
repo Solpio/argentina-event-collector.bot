@@ -6,7 +6,7 @@ import * as process from 'process';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { BotUpdate } from 'src/bot/bot.update';
 import { session } from 'telegraf';
-import { EventInformationScene } from 'src/scenes/event-information.scene';
+import { EventInformationScene } from 'src/bot/scenes/event-information.scene';
 import { EventModule } from 'src/event/event.module';
 
 @Module({

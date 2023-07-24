@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class EventDto {
   @IsNumber()
@@ -15,6 +15,9 @@ export class EventDto {
 
   @IsString()
   date: string;
+
+  @IsBoolean()
+  isApproved: boolean;
 
   @IsString()
   time: string;

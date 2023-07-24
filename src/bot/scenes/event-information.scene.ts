@@ -1,15 +1,18 @@
-import { Ctx, Message, Wizard, WizardStep } from 'nestjs-telegraf';
+import { Action, Ctx, Message, Wizard, WizardStep } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 import { WizardContext } from 'telegraf/typings/scenes';
 import { Update } from 'telegraf/typings/core/types/typegram';
 import { forwardRef, Inject } from '@nestjs/common';
 import { EventService } from 'src/event/event.service';
+import { BotService } from 'src/bot/bot.service';
 
 @Wizard('createEvent')
 export class EventInformationScene {
   constructor(
     @Inject(forwardRef(() => EventService))
     private readonly eventService: EventService,
+    @Inject(forwardRef(() => BotService))
+    private readonly botService: BotService,
   ) {}
   @WizardStep(0)
   async step0(
@@ -107,21 +110,33 @@ export class EventInformationScene {
     ctx: Context & WizardContext & { update: Update.CallbackQueryUpdate },
   ) {
     const cbQuery = ctx.update.callback_query;
-    const userAnswer = 'data' in cbQuery ? cbQuery.data : null;
+    if (cbQuery) {
+      const userAnswer = 'data' in cbQuery ? cbQuery.data : null;
 
-    if (userAnswer === 'False') {
-      await ctx.scene.reenter();
-    } else {
-      await this.eventService.create({
-        id: ctx.from.id,
-        title: ctx.wizard.state['data'].eventName,
-        link: ctx.wizard.state['data'].eventLink,
-        description: ctx.wizard.state['data'].eventDescription,
-        time: ctx.wizard.state['data'].eventTime,
-        date: ctx.wizard.state['data'].eventDate,
-      });
-      await ctx.reply('Ваши данные были сохранены');
-      await ctx.scene.leave();
+      if (userAnswer === 'False') {
+        await ctx.scene.reenter();
+      } else {
+        await this.eventService.create({
+          id: ctx.from.id,
+          title: ctx.wizard.state['data'].eventName,
+          link: ctx.wizard.state['data'].eventLink,
+          description: ctx.wizard.state['data'].eventDescription,
+          time: ctx.wizard.state['data'].eventTime,
+          isApproved: false,
+          date: ctx.wizard.state['data'].eventDate,
+        });
+        await ctx.reply('Ваши данные были сохранены');
+        await this.botService.sendMessage(
+          250101824,
+          `Новое мероприятие\n ${ctx.wizard.state['data'].eventName}`,
+        );
+        await ctx.scene.leave();
+      }
     }
+  }
+
+  @Action('1')
+  async action(@Ctx() ctx: Context & WizardContext) {
+    console.log(ctx);
   }
 }

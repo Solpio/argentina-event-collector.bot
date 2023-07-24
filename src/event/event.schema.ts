@@ -7,6 +7,7 @@ interface IEvent {
   link: string;
   description: string;
   date: string;
+  isApproved: boolean;
   time: string;
 }
 
@@ -28,6 +29,9 @@ export class Event {
 
   @Prop()
   date: string;
+
+  @Prop()
+  isApproved: boolean;
 
   @Prop()
   time: string;
